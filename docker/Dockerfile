@@ -1,14 +1,12 @@
 FROM openjdk:21
 
-COPY target/*.jar /srv
-COPY docker/gateway-service.sh /srv
+WORKDIR /srv
 
-RUN chmod +x /srv/gateway-service.sh
+COPY target/*.jar .
+COPY docker/gateway-service.sh .
+
+RUN chmod +x gateway-service.sh
 
 EXPOSE 8100
-
-VOLUME [ "/srv/logs" ]
-
-WORKDIR /srv
 
 ENTRYPOINT ["./gateway-service.sh"]
