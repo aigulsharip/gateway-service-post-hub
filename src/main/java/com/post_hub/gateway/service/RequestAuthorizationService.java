@@ -2,6 +2,7 @@ package com.post_hub.gateway.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.post_hub.gateway.config.PublicApiPaths;
 import com.post_hub.gateway.model.*;
 import com.post_hub.gateway.model.constants.ApiConstants;
 import com.post_hub.gateway.model.constants.ApiLogMessage;
@@ -42,13 +43,15 @@ public class RequestAuthorizationService {
     private final MicroServiceNames microServiceNames;
     private final ObjectMapper objectMapper;
     private final RemoteIamService remoteIamService;
+    private final PublicApiPaths publicApiPaths;
 
     public RequestAuthorizationService(
-            MicroServiceNames microServiceNames, ObjectMapper objectMapper, @Lazy RemoteIamService remoteIamService
+            MicroServiceNames microServiceNames, ObjectMapper objectMapper, @Lazy RemoteIamService remoteIamService, PublicApiPaths publicApiPaths
     ) {
         this.microServiceNames = microServiceNames;
         this.remoteIamService = remoteIamService;
         this.objectMapper = objectMapper;
+        this.publicApiPaths = publicApiPaths;
     }
 
     public Mono<Void> validateKeyHeader(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -70,8 +73,16 @@ public class RequestAuthorizationService {
         log.info(ApiLogMessage.NAME_OF_CURRENT_METHOD.getMessage(), ApiUtils.getMethodName());
 
         ServerHttpRequest request = exchange.getRequest();
-        Optional<PostHubJwt> jwtOptional = getTokens(request);
+        String path = request.getURI().getPath();
 
+        List<String> publicPaths = publicApiPaths.getPublicPaths();
+        boolean isPublicPath = publicPaths.stream().anyMatch(path::startsWith);
+
+        if (isPublicPath) {
+            return chain.filter(exchange);
+        }
+
+        Optional<PostHubJwt> jwtOptional = getTokens(request);
         if (jwtOptional.isEmpty() || Objects.isNull(jwtOptional.get().getJwt()) || jwtOptional.get().getJwt().isEmpty()) {
             return getUnauthorizedResponse(exchange, ApiLogMessage.TOKEN_IS_INVALID.getMessage());
         }
