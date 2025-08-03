@@ -24,10 +24,8 @@ public class OpenApiConfig {
     public OpenAPI springShopOpenAPI() {
         return new OpenAPI()
                 .info(new Info().title("'POST_HUB' REST API endpoints")
-                        .description("""
-                                'Gateway-service' - is the starting point for the rest of the microservices and the main URL for all endpoints.
-
-                                Created by Mykola Shchypailo | <a href='mailto:mykola.shchypailo@gmail.com'>Send me email</a>"""
+                        .description(
+                             "Gateway-service' - is the starting point for the rest of the microservices and the main URL for all endpoints."
                         )
                         .version("1.0")
                 );
