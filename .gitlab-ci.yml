@@ -122,5 +122,5 @@ deploy:
       echo "!!!!! Docker stop and rm is SUCCESSFUL !!!!!"
 
       echo "!!!!! RUNNING DOCKER !!!!!"
-      ssh root@$HOST "docker run -d --restart unless-stopped --name=$SERVICE_NAME -e PROFILE=prod -p $SERVICE_PORT:$SERVICE_PORT $CI_REGISTRY/$CI_REGISTRY_USER/$IMAGE_NAME:$CI_COMMIT_BRANCH-$CI_PIPELINE_ID"
+      ssh root@$HOST "docker run -d --restart unless-stopped --name=$SERVICE_NAME -e SPRING_CLOUD_CONSUL_HOST=185.233.119.44 -e SPRING_CLOUD_CONSUL_PORT=8500 -e PROFILE=prod -p $SERVICE_PORT:$SERVICE_PORT $CI_REGISTRY/$CI_REGISTRY_USER/$IMAGE_NAME:$CI_COMMIT_BRANCH-$CI_PIPELINE_ID"
       echo "!!!!! Docker run is SUCCESSFUL !!!!!"
